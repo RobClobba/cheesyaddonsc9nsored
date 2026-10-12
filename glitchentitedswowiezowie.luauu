@@ -1,4 +1,11 @@
 
+cheesy.AddonInfo = {
+    Name = "glitched_entities",
+    Title = "glitched Entities",
+    Description = "spawn Glitch Scribbles, Bash, Blitz, and Drones from a Cheesy tab.",
+    Game = "hotel/mines",
+}
+
 local v1 = unpack or table.unpack
 local Objects = game:GetObjects("rbxassetid://135325993088546")
 local Blue = game.Players.LocalPlayer.PlayerGui.MainUI.Initiator.Main_Game.Health.Music.Blue
@@ -74,229 +81,49 @@ if false then
     v23.Name = "GlitchRush"
     v24.Name = "GlitchRush"
 end
-function deathmsg(p1)
-    LocalPlayer.PlayerGui.MainUI.Death.HelpfulDialog.Text = p1
-    TweenService:Create(LocalPlayer.PlayerGui.MainUI.Death.HelpfulDialog, TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.In), {
-		TextTransparency = 0
-	}):Play()
-
-    local u29 = false
-    local connection2 = UserInputService.InputBegan:Connect(function(input, gameProcessed)
-        if gameProcessed then
-            return
-        end
-
-        local v156 = input.UserInputType == Enum.UserInputType.MouseButton1
-
-        if not v156 then
-            v156 = input.UserInputType == Enum.UserInputType.Touch
-        end
-
-        if v156 then
-            u29 = true
-        end
-    end)
-    local n1 = 0
-
-    while n1 < 5 and not u29 do
-        task.wait(0.1)
-        n1 += 0.1
+local function deathmsg(message)
+    if Library and Library.Notify then
+        Library:Notify({
+            Title = "Glitched Entities",
+            Description = message,
+            Time = 3,
+        })
+    else
+        warn("[Glitched Entities] " .. tostring(message))
     end
-
-    connection2:Disconnect()
-    TweenService:Create(LocalPlayer.PlayerGui.MainUI.Death.HelpfulDialog, TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.In), {
-		TextTransparency = 1
-	}):Play()
-    task.wait(0.5)
 end
-function died(p2, p3, _)
-    LocalPlayer.PlayerGui.MainUI.ZIndexBehavior = "Sibling"
-    wait(3)
-    LocalPlayer.PlayerGui.MainUI.Death.Visible = true
-    LocalPlayer.PlayerGui.MainUI.Death.Static.Name = "Statci"
 
-    local u35 = true
+function died(entityType, entityName, _)
+    local playerGui = LocalPlayer:FindFirstChildOfClass("PlayerGui")
+    local mainUI = playerGui and playerGui:FindFirstChild("MainUI")
+    local stats = mainUI and mainUI:FindFirstChild("Statistics")
+    local deathLabel = stats and stats:FindFirstChild("Death")
 
-    task.spawn(function()
-        while u35 do
-            TweenService:Create(LocalPlayer.PlayerGui.MainUI.Death.HelpfulDialog, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
-				Position = UDim2.fromScale(0.5, 0.5)
-			}):Play()
-            wait(1.5)
-            TweenService:Create(LocalPlayer.PlayerGui.MainUI.Death.HelpfulDialog, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
-				Position = UDim2.fromScale(0.5, 0.4)
-			}):Play()
-            wait(1.5)
-        end
-    end)
-    task.spawn(function()
-        while u35 do
-            TweenService:Create(LocalPlayer.PlayerGui.MainUI.Death.HelpfulDialog, TweenInfo.new(4, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
-				Rotation = 5
-			}):Play()
-            wait(4)
-            TweenService:Create(LocalPlayer.PlayerGui.MainUI.Death.HelpfulDialog, TweenInfo.new(4, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {
-				Rotation = -5
-			}):Play()
-            wait(4)
-        end
-    end)
-    task.spawn(function()
-        while u35 do
-            wait()
-            LocalPlayer.PlayerGui.MainUI.Death.Statci.BackgroundTransparency = 0
-            LocalPlayer.PlayerGui.MainUI.Death.Statci.ImageTransparency = 0.7
-        end
-    end)
-    LocalPlayer.PlayerGui.MainUI.Death.ZIndex = 10000
-
-    if p2 == "Curious" then
-        LocalPlayer.PlayerGui.MainUI.Death.Visible = true
-        LocalPlayer.PlayerGui.MainUI.Death.ImageTransparency = 1
-        LocalPlayer.PlayerGui.MainUI.Death.Statci.Visible = true
-        LocalPlayer.PlayerGui.MainUI.Death.Statci.ImageTransparency = 0.7
-        LocalPlayer.PlayerGui.MainUI.Death.Statci.BackgroundColor3 = Color3.fromRGB(122, 122, 50)
-        LocalPlayer.PlayerGui.MainUI.Death.Statci.ImageColor3 = Color3.fromRGB(50, 170, 25)
-        LocalPlayer.PlayerGui.MainUI.Death.Statci.Static.Visible = false
-        LocalPlayer.PlayerGui.MainUI.Death.Hodler.Visible = false
-        LocalPlayer.PlayerGui.MainUI.Death.HelpfulDialog.Visible = true
-        LocalPlayer.PlayerGui.MainUI.Death.HelpfulDialog.TextTransparency = 1
-        LocalPlayer.PlayerGui.MainUI.Death.HelpfulDialog.TextColor3 = Color3.fromRGB(255, 255, 0)
-        t1.curious:Play()
-    else
-        LocalPlayer.PlayerGui.MainUI.Death.Visible = true
-        LocalPlayer.PlayerGui.MainUI.Death.ImageTransparency = 1
-        LocalPlayer.PlayerGui.MainUI.Death.Statci.Visible = true
-        LocalPlayer.PlayerGui.MainUI.Death.Statci.ImageTransparency = 0.7
-        LocalPlayer.PlayerGui.MainUI.Death.Statci.BackgroundColor3 = Color3.fromRGB(0, 181, 202)
-        LocalPlayer.PlayerGui.MainUI.Death.Statci.ImageColor3 = Color3.fromRGB(0, 217, 226)
-        LocalPlayer.PlayerGui.MainUI.Death.Statci.Static.Visible = false
-        LocalPlayer.PlayerGui.MainUI.Death.Hodler.Visible = false
-        LocalPlayer.PlayerGui.MainUI.Death.HelpfulDialog.Visible = true
-        LocalPlayer.PlayerGui.MainUI.Death.HelpfulDialog.TextTransparency = 1
-        LocalPlayer.PlayerGui.MainUI.Death.HelpfulDialog.TextColor3 = Color3.fromRGB(158, 239, 255)
-        t1.guiding:Play()
+    if deathLabel then
+        deathLabel.Text = "Died to " .. tostring(t2[entityName] or entityName)
     end
 
-    if p2 == "Curious" then
-        if data[p2].Fully == 1 then
-            deathmsg("Oh.")
-            deathmsg("It isn't supposed to be here... I'm not sure how my... hmm...")
-            deathmsg("I'm not sure how it works... I believe it attacks stragglers, if I remember correctly?")
-        elseif data[p2].Fully == 2 then
-            deathmsg("There must be a tear... that thing shouldn't be here..")
-            deathmsg("Did it follow you in?")
-            deathmsg("Just... try sticking together more. Got it?")
-        elseif data[p2].Fully >= 3 then
-            deathmsg("Again? I have to fix that... noted for later.")
-            deathmsg("Look. Just stick together. Alright? It's easy.")
-        end
+    deathmsg("You were caught by " .. tostring(entityName) .. ".")
 
-        local v36 = math.round((math.random(1, 4)))
+    local deathData = data[entityType]
+    if deathData then
+        deathData[entityName] = (deathData[entityName] or 0) + 1
+        deathData.Fully = (deathData.Fully or 0) + 1
 
-        if v36 == 1 then
-            deathmsg("You can do this. I believe in you. I'll see you next time. Right?")
-        elseif v36 == 2 then
-            deathmsg("See you next time.")
-        elseif v36 == 3 then
-            deathmsg("Alright, hurry back. We're not done yet.")
-        elseif v36 == 4 then
-            deathmsg("Anyways, I hope you don't mind trying again. It would be helpful.")
-        end
-    else
-        if data[p2].Fully == 1 then
-            local v37 = math.round((math.random(1, 2)))
-
-            if v37 ~= 1 and v37 == 2 then
-                deathmsg("The Hotel isn't a simple place...")
-            end
-
-            deathmsg("Hmm...")
-            deathmsg("I'm terribly sorry. I'm not sure what happened to you.")
-            deathmsg("You just... died.")
-        elseif data[p2].Fully == 2 then
-            deathmsg("Hmm...")
-            deathmsg("Again, I'm not sure what happened to you")
-            deathmsg("I think something’s causing you to see things...")
-        elseif data[p2].Fully >= 3 then
-            deathmsg("I think I've figured this out.")
-            deathmsg("Something is causing you to see things... and it seems to have induced a heart attack.")
-        end
-
-        local v38 = math.round((math.random(1, 2)))
-        local v39 = v38 == 1
-
-        if v39 then
-            v39 = game.ReplicatedStorage.GameData.Floor.Value == "Mines"
-        end
-
-        if v39 then
-            deathmsg("You’ve done great! Don’t give up!")
-        else
-            local v40 = v38 == 2
-
-            if v40 then
-                v40 = game.ReplicatedStorage.GameData.Floor.Value == "Mines"
-            end
-
-            if v40 then
-                deathmsg("You made it this far! Keep going!")
-            end
-        end
+        pcall(function()
+            writefile("GlitchDeaths.json", HttpService:JSONEncode(data))
+        end)
     end
 
-    LocalPlayer.PlayerGui.MainUI.Statistics.Death.Text = "Died to " .. t2[p3]
-    u35 = false
-
-    local v41 = data[p2]
-
-    v41[p3] = v41[p3] + 1
-
-    local v42 = data[p2]
-    local s2 = "Fully"
-
-    v42[s2] = v42[s2] + 1
-    writefile("GlitchDeaths.json", HttpService:JSONEncode(data))
-    TweenService:Create(LocalPlayer.PlayerGui.MainUI.Death.Statci, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.In), {
-		BackgroundTransparency = 1
-	}):Play()
-    TweenService:Create(LocalPlayer.PlayerGui.MainUI.Death.Statci, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.In), {
-		ImageTransparency = 1
-	}):Play()
-
-    if p2 == "Curious" then
+    if entityType == "Curious" then
         t1.curious.Playing = false
         t1.curious.End:Play()
     else
         t1.guiding.Playing = false
         t1.guiding.End:Play()
     end
-
-    wait(1)
-    LocalPlayer.PlayerGui.MainUI.Death.Statci.Name = "Static"
-    LocalPlayer.PlayerGui.MainUI.Death.Visible = false
-
-    local _print = print
-    local Fully = HttpService:JSONDecode(readfile("GlitchDeaths.json")).Guiding.Fully
-    local GlitchScribbles = HttpService:JSONDecode(readfile("GlitchDeaths.json")).Guiding.GlitchScribbles
-    local GlitchBash = HttpService:JSONDecode(readfile("GlitchDeaths.json")).Guiding.GlitchBash
-    local GlitchBlitz = HttpService:JSONDecode(readfile("GlitchDeaths.json")).Guiding.GlitchBlitz
-    local v49 = HttpService
-    local t5 = { readfile("GlitchDeaths.json") }
-    local GlitchDrones = v49:JSONDecode(v1(t5)).Guiding.GlitchDrones
-    local v52 = HttpService
-    local t6 = { readfile("GlitchDeaths.json") }
-    local Fully2 = v52:JSONDecode(v1(t6)).Curious.Fully
-    local v55 = HttpService
-    local t7 = { readfile("GlitchDeaths.json") }
-    local GlitchScribbles2 = v55:JSONDecode(v1(t7)).Curious.GlitchScribbles
-    local GlitchBash2 = HttpService:JSONDecode(readfile("GlitchDeaths.json")).Curious.GlitchBash
-    local GlitchBlitz2 = HttpService:JSONDecode(readfile("GlitchDeaths.json")).Curious.GlitchBlitz
-    local v60 = HttpService
-    local t8 = { readfile("GlitchDeaths.json") }
-
-    _print("GLITCH DEATHS: {Guiding={Fully=", Fully, ", GlitchScribbles=", GlitchScribbles, ", GlitchBash=", GlitchBash, ", GlitchBlitz=", GlitchBlitz, ", GlitchDrones=", GlitchDrones, "}, Curious={Fully=", Fully2, ", GlitchScribbles=", GlitchScribbles2, ", GlitchBash=", GlitchBash2, ", GlitchBlitz=", GlitchBlitz2, ", GlitchDrones=", v60:JSONDecode(v1(t8)).Curious.GlitchDrones, "}")
 end
+
 function checkplr(p5, p6, p7, p8)
     if game.Players.LocalPlayer.Character:FindFirstChildWhichIsA("Humanoid", true).Health <= 0 then
         return
@@ -563,6 +390,10 @@ function move(p12, p13, p14, p15, p16, p17, p18, p19)
     Debris:AddItem(p12, 10)
 end
 function spawnscribbles()
+    if not workspace:FindFirstChild("CurrentRooms") or not gethroom() then
+        deathmsg("CurrentRooms is not ready yet.")
+        return
+    end
     local clone = scribbles:Clone()
 
     blockdoor(workspace.CurrentRooms[tostring(tonumber(gethroom().Name) - 1)])
@@ -631,7 +462,6 @@ function glitch(p20)
     local Attack = clone.Animations.Attack
     local AnimationController = clone.AnimationController
     local Ambience_Glitch = game.ReplicatedStorage.ModulesClient.EntityModules.Glitch.Ambience_Glitch
-    local GlitchScreen = LocalPlayer.PlayerGui.MainUI.MainFrame.GlitchScreen
 
     clone.Parent = workspace
     LocalPlayer.Character.HumanoidRootPart.Anchored = true
@@ -684,9 +514,7 @@ function glitch(p20)
     track:Stop()
     AnimationController:LoadAnimation(Attack):Play()
     wait(0.2)
-    GlitchScreen.Visible = true
-    wait(1)
-    GlitchScreen.Visible = false
+    deathmsg("Glitch encounter triggered.")
     clone:Destroy()
     LocalPlayer.Character.HumanoidRootPart.Anchored = false
     wait(0.1)
@@ -694,104 +522,72 @@ function glitch(p20)
     wait(0.4)
 
     if p20 == true then
-        local GlitchTrial = LocalPlayer.PlayerGui.MainUI.MainFrame.GlitchTrial
-        local TextLabel = GlitchTrial.TextLabel
-        local Sound2 = GlitchTrial:FindFirstChild("Sound")
-
-        if not Sound2 then
-            Sound2 = Instance.new("Sound")
-        end
-
-        Sound2.SoundId = "rbxassetid://108642841511541"
-
-        local DistortionSoundEffect2 = Sound2:FindFirstChild("DistortionSoundEffect")
-
-        if not DistortionSoundEffect2 then
-            DistortionSoundEffect2 = Instance.new("DistortionSoundEffect")
-        end
-
-        DistortionSoundEffect2.Parent = Sound2
-        DistortionSoundEffect2.Level = 0.89
-        DistortionSoundEffect2.Priority = 0
-        DistortionSoundEffect2.Enabled = true
-
-        local EqualizerSoundEffect = Sound2:FindFirstChild("EqualizerSoundEffect")
-
-        if not EqualizerSoundEffect then
-            EqualizerSoundEffect = Instance.new("EqualizerSoundEffect")
-        end
-
-        EqualizerSoundEffect.Parent = Sound2
-        EqualizerSoundEffect.HighGain = 4
-        EqualizerSoundEffect.Priority = 0
-        EqualizerSoundEffect.MidGain = 0
-        EqualizerSoundEffect.LowGain = 3
-        EqualizerSoundEffect.Enabled = true
-        Sound2.Parent = GlitchTrial
-        Sound2:Play()
-        GlitchTrial.Visible = true
-        TextLabel.Text = "V0hBVCBUSEUgRlVDSw=="
-        TextLabel.Position = UDim2.fromScale(0.3, 0.7)
-        TextLabel.TextColor3 = Color3.new(1, 0, 0)
-        GlitchTrial.ImageColor3 = TextLabel.TextColor3
-        wait(0.35)
-        TextLabel.Text = "QklUQ0ggVEhJUyBJUyBNT0RERUQ="
-        TextLabel.Position = UDim2.fromScale(0.2, 0.4)
-        TextLabel.TextColor3 = Color3.new(0, 1, 0)
-        GlitchTrial.ImageColor3 = TextLabel.TextColor3
-        wait(0.35)
-        TextLabel.Text = "YW55d2F5cyBpIGhvcGUgdSBzdXJ2aXZl=="
-        TextLabel.Position = UDim2.fromScale(0.6, 0.6)
-        TextLabel.TextColor3 = Color3.new(0, 0, 1)
-        GlitchTrial.ImageColor3 = TextLabel.TextColor3
-        wait(0.35)
-        GlitchTrial.Visible = false
+        deathmsg("Glitch trial event triggered.")
     end
 
     wait(0.5)
     SoundHurt:Stop()
     SoundHurt.Volume = 0.15
 end
-repeat
-    wait(0.2)
-until workspace.CurrentRooms:FindFirstChild("GlitchCube", true)
-local GlitchCube = workspace.CurrentRooms:FindFirstChild("GlitchCube", true)
-local BetterPrompt = GlitchCube:FindFirstChild("BetterPrompt")
-if not BetterPrompt then
-    BetterPrompt = GlitchCube.ModulePrompt:Clone()
-end
-local v27 = BetterPrompt
-v27.Name = "BetterPrompt"
-if math.random(1, 7) <= 3 then
-    v27.Enabled = false
-else
-    GlitchCube.ModulePrompt.Enabled = false
-end
-v27.Parent = GlitchCube
-v27.Triggered:Connect(function()
-    v27.Enabled = false
-    glitch(true)
-    GlitchCube:Destroy()
+-- Cheesy UI: entity controls live in this tab instead of a separate custom GUI.
+local GlitchedEntitiesTab = cheesy:AddTab("Glitched Entities", "skull")
 
-    local v153 = math.random(1, 4)
+local EntityGroup = cheesy:AddLeftGroupbox("Spawn entities", GlitchedEntitiesTab)
+local EventGroup = cheesy:AddRightGroupbox("Glitch event", GlitchedEntitiesTab)
 
-    if v153 == 1 then
-        spawnbash()
+EntityGroup:AddLabel({
+    Text = "Spawn one of the glitched entities from the Cheesy menu.",
+    DoesWrap = true,
+})
 
-        return
-    end
-
-    if v153 == 2 then
+EntityGroup:AddButton({
+    Text = "Spawn Glitch Scribbles",
+    Func = function()
         spawnscribbles()
+    end,
+})
 
-        return
-    end
+EntityGroup:AddButton({
+    Text = "Spawn Glitch Bash",
+    Func = function()
+        spawnbash()
+    end,
+})
 
-    if v153 == 3 then
+EntityGroup:AddButton({
+    Text = "Spawn Glitch Blitz",
+    Func = function()
         spawnblitz()
+    end,
+})
 
-        return
-    end
+EntityGroup:AddButton({
+    Text = "Spawn Glitch Drones",
+    Func = function()
+        spawndrones()
+    end,
+})
 
-    spawndrones()
-end)
+EventGroup:AddLabel({
+    Text = "Plays the Glitch encounter effect. This no longer creates or controls a separate custom GUI.",
+    DoesWrap = true,
+})
+
+EventGroup:AddButton({
+    Text = "Trigger Glitch Encounter",
+    Func = function()
+        task.spawn(function()
+            glitch(false)
+        end)
+    end,
+})
+
+EventGroup:AddButton({
+    Text = "Trigger Glitch Trial",
+    Func = function()
+        task.spawn(function()
+            glitch(true)
+        end)
+    end,
+})
+
